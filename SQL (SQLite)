@@ -1,0 +1,15 @@
+SELECT
+    s.Store,
+    ROUND (
+    AVG (CASE WHEN f.IsHoliday = 'TRUE' THEN s.Weekly_Sales END),2) AS holiday_sales,
+    ROUND (
+    AVG (CASE WHEN f.IsHoliday = 'FALSE' THEN s.Weekly_Sales END),2) AS regular_sales,
+    ROUND (
+    100.0 *
+    (AVG(CASE WHEN f.IsHoliday = 'TRUE' THEN s.Weekly_Sales END)
+     - AVG(CASE WHEN f.IsHoliday = 'FALSE' THEN s.Weekly_Sales END))
+     / AVG(CASE WHEN f.IsHoliday = 'FALSE' THEN s.Weekly_Sales END),2) AS holiday_lift_pct
+FROM sales s
+JOIN features f ON s.Date = f.Date AND s.Store = f.Store
+GROUP BY s.Store
+ORDER BY holiday_lift_pct DESC
